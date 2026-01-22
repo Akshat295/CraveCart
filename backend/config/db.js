@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const connectDB = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://AJ2905:Akshat2905@videocallapp.efmtwow.mongodb.net/CraveCart"
+      process.env.MONGO_DB_URL
     );
 
     console.log("MongoDB connected successfully ✅");
