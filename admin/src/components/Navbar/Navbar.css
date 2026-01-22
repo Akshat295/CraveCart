@@ -1,0 +1,30 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4%;
+}
+
+.navbar .logo {
+    height: 12vh;
+    width: 6vw;
+    border-radius: 100%;
+}
+
+.navbar .profile {
+    width: 40px;
+}
+
+@media (max-width : 900px) {
+    .navbar .logo {
+        width: 4vw;
+        height: 6vh;
+    }
+}
+
+@media (max-width : 750px) {
+    .navbar .logo {
+        width: 4vw;
+        height: 6vh;
+    }
+}
