@@ -2,10 +2,23 @@ import React, { useContext } from 'react'
 import './Cart.css'
 import { StoreContext } from "../../Context/StoreContext"
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 const Cart = () => {
 
-  const { cartItems, food_list, removeFromCart, getTotalCartAmount,url } = useContext(StoreContext);
+  const { cartItems, food_list, removeFromCart, getTotalCartAmount,url, token } = useContext(StoreContext);
   const navigate = useNavigate();
+  
+  const handleProceedToCheckout = () => {
+    if (getTotalCartAmount() === 0) {
+      toast.info("Your cart is empty. Add items before checkout.");
+      return;
+    }
+    if (!token) {
+      toast.info("Please login to proceed to checkout.");
+      return;
+    }
+    navigate("/order");
+  };
   return (
     <div className='cart'>
       <div className="cart-items">
@@ -56,7 +69,7 @@ const Cart = () => {
               <b>${getTotalCartAmount() === 0 ? 0  : getTotalCartAmount() + 2}</b>
             </div>
           </div>
-          <button onClick={() => navigate("/order")}>Proceed to Checkout</button>
+          <button onClick={handleProceedToCheckout}>Proceed to Checkout</button>
 
         </div>
         <div className="cart-promocode">
