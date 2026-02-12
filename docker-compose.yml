@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: cravecart-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build: ./frontend
+    container_name: cravecart-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  admin:
+    build: ./admin
+    container_name: cravecart-admin
+    ports:
+      - "5174:80"
+    depends_on:
+      - backend
+
