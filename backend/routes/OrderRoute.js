@@ -3,13 +3,17 @@ import {
   placeOrder,
   verifyPayment,
   getUserOrders,
+  listUserOrders,
+  updateOrderStatus,
 } from "../controllers/orderController.js";
 import { authMiddleware } from "../middleware/auth.js";
 
-const router = express.Router();
+const orderRouter = express.Router();
 
-router.post("/place", authMiddleware, placeOrder);
-router.post("/verify", authMiddleware, verifyPayment);
-router.get("/user", authMiddleware, getUserOrders);
+orderRouter.post("/place", authMiddleware, placeOrder);
+orderRouter.post("/verify", authMiddleware, verifyPayment);
+orderRouter.get("/user", authMiddleware, getUserOrders);
+orderRouter.get("/list", listUserOrders);
+orderRouter.patch("/status", updateOrderStatus);
 
-export default router;
+export default orderRouter;

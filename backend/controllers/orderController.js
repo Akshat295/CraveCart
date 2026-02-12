@@ -3,8 +3,11 @@ import userModel from "../models/UserModel.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import {
+  sendOrderConfirmationEmail,
+  sendDeliveryConfirmationEmail,
+} from "../utils/emailService.js";
 
-// Ensure .env is loaded before using process.env in this module
 dotenv.config();
 
 if (!process.env.TEST_KEY_ID || !process.env.TEST_KEY_SECRET) {
@@ -49,7 +52,6 @@ const placeOrder = async (req, res) => {
         .json({ success: false, message: "Address is required" });
     }
 
-    // Create order in DB
     const newOrder = new orderModel({
       userId,
       items,
@@ -153,6 +155,39 @@ const verifyPayment = async (req, res) => {
       paymentStatus: updatedOrder.payment,
     });
 
+    // Send order confirmation email
+    try {
+      let userEmail = null;
+      let userName = "";
+
+      if (updatedOrder.userId) {
+        const user = await userModel.findById(updatedOrder.userId);
+        if (user) {
+          userEmail = user.email; 
+          userName = user.name || updatedOrder.address?.firstName || "";
+        }
+      }
+
+      // Fallback to address email only if UserModel lookup fails
+      if (!userEmail) {
+        userEmail = updatedOrder.address?.email;
+        userName = updatedOrder.address?.firstName || "";
+      }
+
+      if (userEmail) {
+        console.log("[Payment] Sending order confirmation email to:", userEmail);
+        await sendOrderConfirmationEmail(updatedOrder, userEmail, userName);
+      } else {
+        console.warn("[Payment] No email found for order confirmation", {
+          orderId: updatedOrder._id,
+          userId: updatedOrder.userId,
+        });
+      }
+    } catch (emailError) {
+      // Don't fail the payment verification if email fails
+      console.error("[Payment] Failed to send order confirmation email", emailError);
+    }
+
     res.json({
       success: true,
       message: "Payment verified",
@@ -194,4 +229,115 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-export { placeOrder, verifyPayment, getUserOrders };
+// ================= LIST ALL ORDERS (ADMIN) =================
+const listUserOrders = async (req, res) => {
+  try {
+    const orders = await orderModel.find({}).sort({ date: -1 }).lean();
+
+    console.log("[Admin] listUserOrders - total orders:", orders.length);
+
+    res.json({ success: true, data: orders });
+  } catch (error) {
+    console.error("[Admin] listUserOrders error", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch orders" });
+  }
+};
+
+// ================= UPDATE ORDER STATUS (ADMIN) =================
+const ORDER_STATUSES = ["Food Processing", "Out for delivery", "Delivered"];
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    console.log("[Admin] updateOrderStatus called", {
+      body: req.body,
+      method: req.method,
+      path: req.path,
+    });
+    const { orderId, status } = req.body;
+
+    if (!orderId) {
+      console.warn("[Admin] Missing orderId in request");
+      return res
+        .status(400)
+        .json({ success: false, message: "Order ID is required" });
+    }
+
+    if (!status || !ORDER_STATUSES.includes(status)) {
+      console.warn("[Admin] Invalid status", { status, validStatuses: ORDER_STATUSES });
+      return res.status(400).json({
+        success: false,
+        message: `Status must be one of: ${ORDER_STATUSES.join(", ")}`,
+      });
+    }
+
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    console.log("[Admin] Order status updated", {
+      orderId: updatedOrder._id,
+      status: updatedOrder.status,
+    });
+
+    // Send delivery confirmation email if status is "Delivered"
+    if (updatedOrder.status === "Delivered") {
+      try {
+        // Always use logged-in user's email from UserModel (not form address email)
+        let userEmail = null;
+        let userName = "";
+
+        if (updatedOrder.userId) {
+          const user = await userModel.findById(updatedOrder.userId);
+          if (user) {
+            userEmail = user.email; // Use authenticated user's email
+            userName = user.name || updatedOrder.address?.firstName || "";
+          }
+        }
+
+        // Fallback to address email only if UserModel lookup fails
+        if (!userEmail) {
+          userEmail = updatedOrder.address?.email;
+          userName = updatedOrder.address?.firstName || "";
+        }
+
+        if (userEmail) {
+          console.log("[Admin] Sending delivery confirmation email to:", userEmail);
+          await sendDeliveryConfirmationEmail(updatedOrder, userEmail, userName);
+        } else {
+          console.warn("[Admin] No email found for delivery confirmation", {
+            orderId: updatedOrder._id,
+            userId: updatedOrder.userId,
+          });
+        }
+      } catch (emailError) {
+        // Don't fail the status update if email fails
+        console.error("[Admin] Failed to send delivery confirmation email", emailError);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: "Status updated",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("[Admin] updateOrderStatus error", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+      error: error.message,
+    });
+  }
+};
+
+export { placeOrder, verifyPayment, getUserOrders, listUserOrders, updateOrderStatus };
