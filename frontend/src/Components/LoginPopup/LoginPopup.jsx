@@ -3,6 +3,7 @@ import './LoginPopup.css'
 import { assets } from '../../assets/frontend_assets/assets'
 import { StoreContext } from '../../Context/StoreContext'
 import axios from "axios" ;
+import { toast } from "react-toastify";
 
 const LoginPopup = ({ setShowLogin }) => {
 
@@ -35,8 +36,9 @@ const LoginPopup = ({ setShowLogin }) => {
             setToken(response.data.token) ;
             localStorage.setItem("token" , response.data.token) ;
             setShowLogin(false) ;
+            toast.success(currstate === "Login" ? "Logged in successfully" : "Account created & logged in");
         } else {
-            alert(response.data.message) ;
+            toast.error(response.data.message || "Login failed");
         }
     }
 

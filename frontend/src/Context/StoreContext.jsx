@@ -7,6 +7,7 @@ const StoreContextProvider = (props) => {
     const [cartItems, setCartItems] = useState({});
     const url = "http://localhost:4000" ;
     const [token, setToken] = useState("") ;
+    const [tokenLoading, setTokenLoading] = useState(true);
     const[food_list,setFoodList] = useState([]);
 
     const addToCart = async (itemId) => {
@@ -69,6 +70,8 @@ const StoreContextProvider = (props) => {
                 localStorage.removeItem("token");
                 setToken("");
             }
+            // Mark token loading as complete
+            setTokenLoading(false);
         }
         loadData();
     },[])
@@ -81,7 +84,8 @@ const StoreContextProvider = (props) => {
         getTotalCartAmount,
         url,
         token,
-        setToken
+        setToken,
+        tokenLoading
     }
     return (
         <StoreContext.Provider value={contextValue}>

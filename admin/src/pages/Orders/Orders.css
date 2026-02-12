@@ -1,0 +1,113 @@
+.orders {
+  width: 70%;
+  margin-left: max(5vw, 25px);
+  margin-top: 50px;
+  color: #6d6d6d;
+  font-size: 14px;
+}
+
+.orders > p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.orders-table {
+  display: grid;
+  grid-template-columns: 1.2fr 3fr 1fr 1fr 1.2fr 1.5fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border: 1px solid #cacaca;
+  font-size: 13px;
+}
+
+.orders-table.header {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.orders-order-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orders-order-id img {
+  width: 26px;
+}
+
+.orders-items {
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orders-amount {
+  font-weight: 500;
+}
+
+.orders-payment {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.orders-payment.paid {
+  background-color: #e6ffed;
+  color: #2e7d32;
+}
+
+.orders-payment.pending {
+  background-color: #fff4e5;
+  color: #f57c00;
+}
+
+.orders-status {
+  font-size: 13px;
+}
+
+.orders-status-select {
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #cacaca;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.orders-status-select:focus {
+  outline: none;
+  border-color: #333;
+}
+
+.orders-date {
+  font-size: 12px;
+  color: #777;
+}
+
+.orders-empty {
+  margin-top: 12px;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .orders {
+    width: 100%;
+    margin-left: 0;
+    padding: 0 10px;
+  }
+
+  .orders-table {
+    grid-template-columns: 1.5fr 2.5fr 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 6px;
+  }
+
+  .orders-table.header {
+    display: none;
+  }
+}
+

@@ -3,13 +3,18 @@ import "./MyOrders.css";
 import { StoreContext } from "../../Context/StoreContext";
 
 const MyOrders = () => {
-  const { url, token, setToken } = useContext(StoreContext);
+  const { url, token, setToken, tokenLoading } = useContext(StoreContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
+      // Wait for token to finish loading from localStorage before checking
+      if (tokenLoading) {
+        return;
+      }
+
       console.log("[MyOrders] token in context:", token);
       if (!token) {
         setError("Please login to view your orders.");
@@ -50,7 +55,7 @@ const MyOrders = () => {
     };
 
     fetchOrders();
-  }, [url, token]);
+  }, [url, token, tokenLoading]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -64,6 +69,13 @@ const MyOrders = () => {
 
   const getPaymentStatusLabel = (paid) => {
     return paid ? "Paid" : "Pending";
+  };
+
+  const getDeliveryStatusClass = (status) => {
+    const s = status || "Food Processing";
+    if (s === "Delivered") return "delivery-delivered";
+    if (s === "Out for delivery") return "delivery-out";
+    return "delivery-processing";
   };
 
   return (
@@ -138,7 +150,7 @@ const MyOrders = () => {
               </div>
 
               <div className="my-orders-footer">
-                <span className="my-orders-status-text">
+                <span className={`my-orders-status-text ${getDeliveryStatusClass(order.status)}`}>
                   Status: {order.status || "Food Processing"}
                 </span>
               </div>

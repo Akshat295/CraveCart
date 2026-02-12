@@ -124,6 +124,21 @@
   color: #555;
 }
 
+.my-orders-status-text.delivery-processing {
+  color: #f57c00;
+  font-weight: 500;
+}
+
+.my-orders-status-text.delivery-out {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.my-orders-status-text.delivery-delivered {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .my-orders-body {
     grid-template-columns: 1fr;
