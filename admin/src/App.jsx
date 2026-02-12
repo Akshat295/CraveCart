@@ -7,7 +7,7 @@ import List from './pages/List/List'
 import Orders from './pages/Orders/Orders'
 import { ToastContainer } from 'react-toastify';
 const App = () => {
-  const url = "https://cravecart-uo2h.onrender.com/";
+  const url = "https://cravecart-uo2h.onrender.com";
   return (
     <div>
       <ToastContainer/>
