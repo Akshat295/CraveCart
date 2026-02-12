@@ -1,25 +1,55 @@
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Create transporter for Gmail SMTP
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_APP_PASSWORD, 
-  },
-});
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "CraveCart <onboarding@resend.dev>";
 
-// Verify transporter configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("[Email] Transporter verification failed:", error);
-  } else {
-    console.log("[Email] Server is ready to send emails");
+const sendViaResend = async ({ to, subject, html, text }) => {
+  if (!RESEND_API_KEY) {
+    console.warn("[Email] RESEND_API_KEY not configured. Skipping email send.");
+    return { success: false, message: "Email not configured" };
   }
-});
+
+  if (!to) {
+    console.warn("[Email] No recipient email provided");
+    return { success: false, message: "No email address" };
+  }
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: RESEND_FROM_EMAIL,
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("[Email] Resend API error:", data);
+      return { success: false, message: data.message || "Failed to send email" };
+    }
+
+    console.log("[Email] Email sent via Resend:", {
+      to,
+      id: data.id,
+    });
+
+    return { success: true, id: data.id };
+  } catch (error) {
+    console.error("[Email] Resend request failed:", error);
+    return { success: false, error: error.message };
+  }
+};
 
 // Email template for order confirmation
 const getOrderConfirmationEmail = (order, userName) => {
@@ -217,74 +247,22 @@ Thank you for choosing CraveCart!
 
 // Send order confirmation email
 export const sendOrderConfirmationEmail = async (order, userEmail, userName) => {
-  try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
-      console.warn("[Email] Email credentials not configured. Skipping email send.");
-      return { success: false, message: "Email not configured" };
-    }
-
-    if (!userEmail) {
-      console.warn("[Email] No email address provided for order", order._id);
-      return { success: false, message: "No email address" };
-    }
-
-    const emailContent = getOrderConfirmationEmail(order, userName);
-
-    const mailOptions = {
-      from: `"CraveCart" <${process.env.EMAIL_USER}>`,
-      to: userEmail,
-      subject: emailContent.subject,
-      html: emailContent.html,
-      text: emailContent.text,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("[Email] Order confirmation sent:", {
-      to: userEmail,
-      messageId: info.messageId,
-      orderId: order._id,
-    });
-
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error("[Email] Failed to send order confirmation:", error);
-    return { success: false, error: error.message };
-  }
+  const emailContent = getOrderConfirmationEmail(order, userName);
+  return sendViaResend({
+    to: userEmail,
+    subject: emailContent.subject,
+    html: emailContent.html,
+    text: emailContent.text,
+  });
 };
 
 // Send delivery confirmation email
 export const sendDeliveryConfirmationEmail = async (order, userEmail, userName) => {
-  try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
-      console.warn("[Email] Email credentials not configured. Skipping email send.");
-      return { success: false, message: "Email not configured" };
-    }
-
-    if (!userEmail) {
-      console.warn("[Email] No email address provided for order", order._id);
-      return { success: false, message: "No email address" };
-    }
-
-    const emailContent = getDeliveryConfirmationEmail(order, userName);
-
-    const mailOptions = {
-      from: `"CraveCart" <${process.env.EMAIL_USER}>`,
-      to: userEmail,
-      subject: emailContent.subject,
-      html: emailContent.html,
-      text: emailContent.text,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("[Email] Delivery confirmation sent:", {
-      to: userEmail,
-      messageId: info.messageId,
-      orderId: order._id,
-    });
-
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error("[Email] Failed to send delivery confirmation:", error);
-    return { success: false, error: error.message };
-  }
+  const emailContent = getDeliveryConfirmationEmail(order, userName);
+  return sendViaResend({
+    to: userEmail,
+    subject: emailContent.subject,
+    html: emailContent.html,
+    text: emailContent.text,
+  });
 };
