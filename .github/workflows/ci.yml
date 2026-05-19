@@ -37,3 +37,15 @@ jobs:
     - name: Push Frontend Image
       run: |
         docker push akshatjohri/cravecart-frontend:latest
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd cravecart
+          docker compose pull
+          docker compose down
+          docker compose up -d
