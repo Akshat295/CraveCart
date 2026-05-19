@@ -32,6 +32,10 @@ app.get("/" , (req,res) => {
     res.send("Port is running") ;
 })
 
+app.post("/hello", (req,res) => {
+    res.send("Hello! I am Akshat") ;
+})
+
 app.listen(port ,() => {
     console.log(`server started on port ${port}`) ;
 })

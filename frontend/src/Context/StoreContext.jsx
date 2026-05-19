@@ -5,8 +5,7 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
 
     const [cartItems, setCartItems] = useState({});
-    const url = "https://cravecart-uo2h.onrender.com" ;
-    const [token, setToken] = useState("") ;
+    const url = "http://localhost:4000";    const [token, setToken] = useState("") ;
     const [tokenLoading, setTokenLoading] = useState(true);
     const[food_list,setFoodList] = useState([]);
 
