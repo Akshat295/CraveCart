@@ -119,7 +119,7 @@ Restart Services
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CraveCart.git
+git clone https://github.com/Akshat295/CraveCart.git
 ```
 
 ## Navigate to Project
