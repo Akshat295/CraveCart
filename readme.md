@@ -1,214 +1,284 @@
-# CraveCart
+# 🍔 CraveCart — DevOps Enabled MERN Food Ordering Platform
 
-Full?stack food ordering app with:
-
-- Customer frontend (`frontend/`)
-- Admin dashboard (`admin/`)
-- Node/Express/MongoDB backend (`backend/`)
-- Razorpay integration for payments
-- JWT auth, cart, orders, email notifications
+CraveCart is a full-stack MERN-based food ordering platform designed with a production-style DevOps workflow.  
+This project demonstrates containerization, CI/CD automation, Kubernetes orchestration, cloud deployment, and infrastructure monitoring using modern DevOps tools and practices.
 
 ---
 
-## 1. Tech stack
+# 🚀 Features
 
-- **Frontend**: React + Vite, React Router, React Toastify
-- **Admin**: React + Vite
-- **Backend**: Node.js, Express, Mongoose, JWT, Razorpay SDK, Nodemailer
-- **Database**: MongoDB Atlas (or local MongoDB)
+## 👤 Customer Features
+- Browse food items
+- Add items to cart
+- Place orders securely
+- JWT-based authentication
+- Razorpay payment integration
+- Responsive UI
 
----
-
-## 2. Project structure
-
-- `backend/`
-  - `server.js` ? Express server entry
-  - `config/db.js` ? MongoDB connection
-  - `models/` ? `UserModel`, `FoodModel`, `OrderModel`
-  - `controllers/` ? `userController`, `foodController`, `cartController`, `orderController`
-  - `routes/` ? `/api/user`, `/api/food`, `/api/cart`, `/api/order`
-  - `middleware/auth.js` ? JWT auth middleware
-  - `utils/emailService.js` ? Nodemailer email sending
-  - `.env` ? secrets and configuration (not committed)
-
-- `frontend/`
-  - `src/App.jsx` ? main app + routes
-  - `src/Context/StoreContext.jsx` ? global state (token, cart, food list)
-  - `src/Components/` ? `Navbar`, `Header`, `ExploreMenu`, `FoodDisplay`, `FoodItem`, `LoginPopup`, `Footer`, etc.
-  - `src/Pages/` ? `Home`, `Cart`, `PlaceOrder`, `MyOrders`
-
-- `admin/`
-  - `src/App.jsx` ? admin layout (Navbar + Sidebar + routes)
-  - `src/pages/Add` ? add new food items
-  - `src/pages/List` ? list & remove food items
-  - `src/pages/Orders` ? view and manage all user orders
+## 🛠 Admin Features
+- Manage food items
+- Update order status
+- Track customer orders
+- Admin dashboard management
 
 ---
 
-## 3. Environment variables
+# 🧰 Tech Stack
 
-Create a `.env` file inside `backend/`:
+## Frontend
+- React.js
+- Vite
+- Axios
+- CSS
+
+## Backend
+- Node.js
+- Express.js
+- MongoDB
+- JWT Authentication
+
+## DevOps & Cloud
+- Docker
+- Docker Compose
+- Kubernetes
+- GitHub Actions
+- AWS EC2
+- Docker Hub
+- Linux
+- Prometheus
+- Grafana
+- Node Exporter
+
+---
+
+# 🏗 System Architecture
+
+```text
+                    ┌────────────────────┐
+                    │   GitHub Actions   │
+                    │    CI/CD Pipeline  │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │    Docker Hub      │
+                    │ Container Registry │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+ ┌─────────────────────────────────────────────────────┐
+ │                    AWS EC2                         │
+ │                                                     │
+ │  ┌──────────┐   ┌──────────┐   ┌──────────────┐    │
+ │  │Frontend  │   │ Backend  │   │   MongoDB    │    │
+ │  │Container │   │Container │   │  Container   │    │
+ │  └────┬─────┘   └────┬─────┘   └──────┬───────┘    │
+ │       │              │                │             │
+ │       └──────────────┴────────────────┘             │
+ │                                                     │
+ │   Monitoring Stack                                  │
+ │   ┌──────────┐   ┌──────────┐   ┌──────────────┐    │
+ │   │Prometheus│──▶│ Grafana  │◀──│Node Exporter │    │
+ │   └──────────┘   └──────────┘   └──────────────┘    │
+ └─────────────────────────────────────────────────────┘
+```
+
+---
+
+# ⚙️ CI/CD Workflow
+
+The project uses GitHub Actions for automating:
+
+- Docker image build
+- Docker Hub image publishing
+- AWS EC2 deployment
+- Automated container updates
+
+## 🔄 Deployment Flow
+
+```text
+git push
+   ↓
+GitHub Actions Triggered
+   ↓
+Docker Image Build
+   ↓
+Push Images to Docker Hub
+   ↓
+SSH into AWS EC2
+   ↓
+Pull Latest Containers
+   ↓
+Restart Services
+```
+
+---
+
+# 🐳 Docker Setup
+
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/CraveCart.git
+```
+
+## Navigate to Project
+
+```bash
+cd CraveCart
+```
+
+## Build Containers
+
+```bash
+docker compose build
+```
+
+## Run Containers
+
+```bash
+docker compose up -d
+```
+
+## Stop Containers
+
+```bash
+docker compose down
+```
+
+---
+
+# ☸️ Kubernetes Deployment
+
+The application is deployed using Kubernetes for scalable and self-healing orchestration.
+
+## Kubernetes Components Used
+
+- Deployments
+- Services
+- Pods
+- NodePort Services
+
+## Apply Kubernetes Configurations
+
+```bash
+kubectl apply -f k8s/
+```
+
+## Verify Pods
+
+```bash
+kubectl get pods
+```
+
+## Verify Services
+
+```bash
+kubectl get services
+```
+
+---
+
+# 📊 Monitoring & Observability
+
+Monitoring stack implemented using:
+
+- Prometheus
+- Grafana
+- Node Exporter
+
+## Metrics Monitored
+
+- CPU Usage
+- Memory Usage
+- Disk Usage
+- Container Metrics
+- System Health
+
+---
+
+# 📸 Grafana Monitoring Dashboards
+
+## Infrastructure Monitoring Dashboard
+
+### CPU / Memory Monitoring
+
+![Grafana Dashboard](./screenshots/grafana-dashboard.png)
+
+---
+
+### Node Exporter Metrics
+
+![Node Exporter](./screenshots/node-exporter.png)
+
+---
+
+# 🔐 Environment Variables
+
+Create a `.env` file inside the backend directory.
 
 ```env
-JWT_SECRET=your_jwt_secret
-MONGO_DB_URL=your_mongodb_connection_string
-
-TEST_KEY_ID=your_razorpay_test_key_id
-TEST_KEY_SECRET=your_razorpay_test_key_secret
-
-# Email (Gmail App Password)
-EMAIL_USER=your-email@gmail.com
-EMAIL_APP_PASSWORD=your-app-password
+MONGO_DB_URL=your_mongodb_url
+JWT_SECRET=your_secret
+RAZORPAY_KEY=your_key
+RAZORPAY_SECRET=your_secret
 ```
 
-> For Gmail App Password setup, see `backend/EMAIL_SETUP.md`.
+---
+
+# 🚀 Deployment
+
+The application is deployed on an Ubuntu-based AWS EC2 instance using Docker containers and automated GitHub Actions workflows.
 
 ---
 
-## 4. Backend ? running and endpoints
+# ✨ DevOps Highlights
 
-From `backend/`:
-
-```bash
-npm install
-npm run server   # uses nodemon server.js
-```
-
-Base URL (dev): `http://localhost:4000`
-
-### Auth & users
-
-- `POST /api/user/register` ? register user (name, email, password)
-- `POST /api/user/login` ? login, returns JWT token
-
-### Food
-
-- `GET /api/food/list` ? list all food items
-- `POST /api/food/add` ? add food (admin)
-- `POST /api/food/remove` ? remove food (admin)
-
-### Cart (requires `token` header)
-
-- `POST /api/cart/add` ? add item to cart
-- `POST /api/cart/remove` ? remove item from cart
-- `POST /api/cart/get` ? get current cart
-
-### Orders (customer)
-
-- `POST /api/order/place` ? place order + create Razorpay order
-- `POST /api/order/verify` ? verify payment, mark `payment: true` and send **order confirmation email**
-- `GET  /api/order/user` ? get orders for logged?in user (used in **MyOrders** page)
-
-### Orders (admin)
-
-- `GET  /api/order/list` ? list all user orders (used in admin Orders page)
-- `PATCH /api/order/status` ? update order status (`Food Processing` / `Out for delivery` / `Delivered`); when status becomes `Delivered`, sends **delivery confirmation email**
+- Containerized MERN application using Docker & Docker Compose
+- Implemented CI/CD pipelines using GitHub Actions
+- Automated Docker Hub publishing workflows
+- Deployed applications on AWS EC2
+- Configured Kubernetes Deployments & Services
+- Built infrastructure monitoring dashboards using Prometheus & Grafana
+- Implemented container orchestration and observability workflows
 
 ---
 
-## 5. Frontend (customer app)
+# 📚 Learning Outcomes
 
-From `frontend/`:
+Through this project, I gained hands-on experience in:
 
-```bash
-npm install
-npm run dev
-```
-
-Default dev URL: `http://localhost:5173`
-
-### Pages & features
-
-- **Home**
-  - Hero header, category explorer, food listing
-- **Cart**
-  - Shows items in cart, totals, small delivery fee
-  - Prevents checkout if cart is empty or user not logged in (toast)
-- **PlaceOrder**
-  - Delivery form + order summary
-  - Integrates Razorpay checkout
-- **MyOrders**
-  - Lists orders for logged?in user
-  - Shows payment status and delivery status (`Food Processing`, `Out for delivery`, `Delivered`)
-
-### Auth & toasts
-
-- `LoginPopup` handles **login / signup**.
-- On successful login / signup, shows a toast: ?Logged in successfully? / ?Account created & logged in?.
-- Errors are also shown via toast.
-
-
-### Smooth page transitions
-
-- Routes are wrapped in a `.page` container with a `fadeIn` animation so navigation between pages feels smoother.
+- Containerization
+- CI/CD Automation
+- Cloud Deployment
+- Kubernetes Orchestration
+- Monitoring & Observability
+- Linux-based Infrastructure
+- DevOps Workflows
 
 ---
 
-## 6. Admin panel
+# 🔮 Future Improvements
 
-From `admin/`:
-
-```bash
-npm install
-npm run dev
-```
-
-Default dev URL: `http://localhost:5174` (or next free port).
-
-### Admin pages
-
-- **Add** ? upload new food items with image, description, price, category
-- **List** ? view all food items, remove items
-- **Orders** ? view all user orders with:
-  - Order ID, items, amount, payment status, current status, date
-  - Dropdown to change status (`Food Processing` / `Out for delivery` / `Delivered`)
-  - On ?Delivered?, triggers delivery confirmation email to the user
-
-> Note: Admin API routes are currently not protected with separate admin auth; use cautiously.
+- Nginx Reverse Proxy
+- HTTPS SSL Setup
+- Kubernetes Ingress
+- Horizontal Pod Autoscaling
+- Persistent Volumes
+- Terraform Infrastructure Automation
+- AWS EKS Deployment
 
 ---
 
-## 7. Payments ? Razorpay flow
+# 👨‍💻 Author
 
-1. User fills cart & address, clicks **Proceed to Payment**.
-2. Frontend calls `POST /api/order/place` ? backend creates:
-   - MongoDB order document
-   - Razorpay order via SDK
-3. Frontend opens Razorpay Checkout with returned `order_id`.
-4. On successful payment, Razorpay calls `handler` in frontend, which calls `POST /api/order/verify`.
-5. Backend verifies signature:
-   - Sets `payment: true` on order
-   - Sends **order confirmation email**
-6. Frontend clears cart and navigates to **MyOrders**.
+## Akshat Johri
+
+- GitHub: https://github.com/Akshat295
+- LinkedIn: https://www.linkedin.com/in/akshat-johri-9724a625a/
 
 ---
 
-## 8. Emails
+# ⭐ Support
 
-- Uses **Nodemailer** with Gmail SMTP (App Password).
-- **Order confirmation email**:
-  - Sent after successful payment verification.
-  - Goes to the **logged?in user?s email** (from `UserModel`), with fallback to address email if necessary.
-- **Delivery confirmation email**:
-  - Sent when admin sets status to `Delivered` via admin Orders page.
-
-See `backend/EMAIL_SETUP.md` for step?by?step configuration.
-
----
-
-## 9. Notes & common issues
-
-- If backend shows `MongoServerSelectionError`, check your `MONGO_DB_URL` and network.
-- If Razorpay throws `key_id or oauthToken is mandatory`, verify `TEST_KEY_ID` and `TEST_KEY_SECRET` in `.env` and restart backend.
-- If emails are not sent:
-  - Confirm `EMAIL_USER` and `EMAIL_APP_PASSWORD` are set.
-  - Check backend logs for `[Email]` messages.
-
----
-
-## 10. Future improvements (ideas)
-
-- Separate admin authentication and protected admin routes
-- Order tracking page with timeline
-- Coupon / promo code system
-- Saved addresses and profile management
+If you found this project useful, give it a ⭐ on GitHub!
